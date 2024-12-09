@@ -19,8 +19,6 @@ def exhibit(lines, columns, title, img, index=None):
   if index is None:
     if len(title) == len(img):
       index = np.arange(0,len(img)) + 1
-  print(len(title))
-  print(len(img))
   if len(index) == len(title) == len(img):
     #f,axes = plt.subplots(figsize=(15,15))
     for cont in range(len(index)):

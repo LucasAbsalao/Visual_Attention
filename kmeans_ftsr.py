@@ -60,26 +60,13 @@ def k_means_gray(img):
 def segment_mean(img):
     return 2*(np.uint8(np.round(np.mean(img))))
 
-def write_images(path_folder,name_folder,images):
-    os.system('mkdir ' + path_folder)
-    write_img = []
-    for image in images:
-        write_img.append(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
-    cv2.imwrite(path_folder+name_folder+'_imagem_original.png', write_img[0])
-    cv2.imwrite(path_folder+name_folder+'_saliency_map.png', write_img[1])
-    cv2.imwrite(path_folder+name_folder+'_threshold_otsu.png', write_img[2])
-    cv2.imwrite(path_folder+name_folder+'_kmeans_saliency_map.png', write_img[3])
-    cv2.imwrite(path_folder+name_folder+'_kmeans_image.png', write_img[4])
+
+
+
 
 PATH_IMAGES = 'images/'
-PATH_OUTPUT = 'kmeans_saliency/'
-path = PATH_IMAGES + 'triangulo_ryb.png'
-
-name_folder = (path.split('/')[-1]).split('.')[0]
-path_folder = PATH_OUTPUT + name_folder + '/'
-
-img = cv2.imread(path)
+img = cv2.imread(PATH_IMAGES + 'Flor_Joaninha.jpg')
 
 img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 Imean = lab_mean(img_lab)
@@ -111,16 +98,17 @@ exhibit(1,3,titles,images)
 
 
 #Imagem gerada usando Kmeans
+img_hsv = cv2.cvtcolor(img, cv2.COLOR_RGB2LAB)
 segment_saliency = k_means_gray(saliency_img)
-segment_m = segment_mean(segment_saliency)
-print(segment_m)
-ret, thresh = cv2.threshold(segment_saliency, segment_m, 255, cv2.THRESH_BINARY)
-attention_img_kmeans = cv2.bitwise_and(img,img,mask=thresh)
+
+
+
+
 
 plt.figure(figsize=(6.4*5,4.8*5), constrained_layout=False)
 titles = ['Imagem Original', 'Mapa de Saliência Kmeans', 'Imagem Final Kmeans']
 images = [img, segment_saliency, attention_img_kmeans]
 exhibit(1,3,titles,images)
 
-images = [img, saliency_img, attention_img_otsu, segment_saliency,attention_img_kmeans]
-write_images(path_folder, name_folder,images)
+#erro
+showAndDestroy("Imagem Final", segment_saliency)
