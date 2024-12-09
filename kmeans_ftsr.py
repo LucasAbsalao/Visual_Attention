@@ -41,8 +41,8 @@ def saliency_map(img, Imean):
     Iwhc = np.array(Iwhc, dtype=np.uint8)
     return Iwhc
 
-def k_means_gray(img):
-    vectorized = img.reshape((-1))
+def k_means(img):
+    vectorized = img.reshape((-1,3))
     vectorized = np.float32(vectorized)
 
     k=5
@@ -66,7 +66,7 @@ def segment_mean(img):
 
 
 PATH_IMAGES = 'images/'
-img = cv2.imread(PATH_IMAGES + 'Flor_Joaninha.jpg')
+img = cv2.imread(PATH_IMAGES + 'flower.jpeg')
 
 img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 Imean = lab_mean(img_lab)
@@ -98,17 +98,16 @@ exhibit(1,3,titles,images)
 
 
 #Imagem gerada usando Kmeans
-img_hsv = cv2.cvtcolor(img, cv2.COLOR_RGB2LAB)
-segment_saliency = k_means_gray(saliency_img)
+img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+segment_hsv = k_means(img_hsv)
+segment_rgb = cv2.cvtColor(segment_hsv, cv2.COLOR_HSV2RGB)
+
 
 
 
 
 
 plt.figure(figsize=(6.4*5,4.8*5), constrained_layout=False)
-titles = ['Imagem Original', 'Mapa de Saliência Kmeans', 'Imagem Final Kmeans']
-images = [img, segment_saliency, attention_img_kmeans]
-exhibit(1,3,titles,images)
-
-#erro
-showAndDestroy("Imagem Final", segment_saliency)
+titles = ['Imagem Original', 'Mapa de Saliência Kmeans']
+images = [img, segment_rgb]
+exhibit(1,2,titles,images)

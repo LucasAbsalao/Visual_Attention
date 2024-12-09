@@ -72,6 +72,7 @@ def write_images(path_folder,name_folder,images):
     cv2.imwrite(path_folder+name_folder+'_kmeans_saliency_map.png', write_img[3])
     cv2.imwrite(path_folder+name_folder+'_kmeans_image.png', write_img[4])
 
+
 PATH_IMAGES = 'images/'
 PATH_OUTPUT = 'kmeans_saliency/'
 path = PATH_IMAGES + 'triangulo_ryb.png'
