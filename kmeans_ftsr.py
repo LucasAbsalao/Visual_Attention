@@ -45,7 +45,7 @@ def k_means(img):
     vectorized = img.reshape((-1,3))
     vectorized = np.float32(vectorized)
 
-    k=5
+    k=6
     attempts = 10
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 0.95)
 
@@ -60,13 +60,48 @@ def k_means(img):
 def segment_mean(img):
     return 2*(np.uint8(np.round(np.mean(img))))
 
+def get_unique_values(img):
+    only = np.unique(img.reshape(-1,3), axis=0)
+    return only
 
+def segment_saliency_map(segmented_img, saliency, unique):
+    segmented_saliency = np.zeros(saliency.shape, dtype=np.uint8)
+    for uni in unique:
+        saliency_values=[]
+        saliency_index=[]
+        for i, row in enumerate(segmented_img):
+            for j,element in enumerate(row):
+                if element.tolist() == uni.tolist():
+                    saliency_index.append((i,j))
+                    saliency_values.append(saliency[i][j])
 
+        media = np.uint8(np.round(np.mean(saliency_values)))
 
+        for (i,j) in saliency_index:
+            segmented_saliency[i,j] = media
 
+    return segmented_saliency 
+
+def write_images(path_folder,name_folder,images):
+    os.system('mkdir ' + path_folder)
+    write_img = []
+    for image in images:
+        write_img.append(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
+
+    cv2.imwrite(path_folder+name_folder+'_imagem_original.png', write_img[0])
+    cv2.imwrite(path_folder+name_folder+'_saliency_map.png', write_img[1])
+    cv2.imwrite(path_folder+name_folder+'_threshold_otsu.png', write_img[2])
+    cv2.imwrite(path_folder+name_folder+'_kmeansHSV_saliency_map.png', write_img[3])
+    cv2.imwrite(path_folder+name_folder+'_kmeans_image.png', write_img[4])
 
 PATH_IMAGES = 'images/'
-img = cv2.imread(PATH_IMAGES + 'flower.jpeg')
+PATH_OUTPUT = 'kmeans_hsv_saliency/'
+path = PATH_IMAGES + 'carro-rua.jpg'
+
+name_folder = (path.split('/')[-1]).split('.')[0]
+path_folder = PATH_OUTPUT + name_folder + '/'
+
+img = cv2.imread(path)
 
 img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 Imean = lab_mean(img_lab)
@@ -77,6 +112,8 @@ Imean_rgb = cv2.cvtColor(np.array([[Imean]]), cv2.COLOR_LAB2RGB)
 img_mean = np.full((img_lab.shape), Imean_rgb, dtype = np.uint8)
 plt.imshow(img_mean)
 plt.show()
+
+print(img.shape)
 
 
 #Smoothing da imagem com gaussiana 5x5 e criação do mapa de saliência
@@ -98,16 +135,22 @@ exhibit(1,3,titles,images)
 
 
 #Imagem gerada usando Kmeans
-img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-segment_hsv = k_means(img_hsv)
-segment_rgb = cv2.cvtColor(segment_hsv, cv2.COLOR_HSV2RGB)
+segment_hsv = k_means(img_lab)
+segment_rgb = cv2.cvtColor(segment_hsv, cv2.COLOR_LAB2RGB)
+segments_values = get_unique_values(segment_rgb)
 
 
-
-
+segment_saliency = segment_saliency_map(segment_rgb, saliency_img, segments_values)
+segment_m = segment_mean(saliency_img)
+print(segment_m)
+ret, thresh = cv2.threshold(segment_saliency, segment_m, 255, cv2.THRESH_BINARY)
+attention_img_kmeans = cv2.bitwise_and(img,img,mask=thresh)
 
 
 plt.figure(figsize=(6.4*5,4.8*5), constrained_layout=False)
-titles = ['Imagem Original', 'Mapa de Saliência Kmeans']
-images = [img, segment_rgb]
-exhibit(1,2,titles,images)
+titles = ['Imagem Original', 'Segmentação Kmeans', 'Mapa de Saliência', 'Segmentação Saliencia','Imagem Final']
+images = [img, segment_rgb,saliency_img,segment_saliency,attention_img_kmeans]
+exhibit(1,5,titles,images)
+
+images = [img, saliency_img, attention_img_otsu, segment_saliency,attention_img_kmeans]
+write_images(path_folder, name_folder,images)

@@ -27,7 +27,9 @@ def gaussian_smoothing(img, kernel):
     return result
 
 
-def euclidean_distance(vector):
+def euclidean_distance(vector1,vector2):
+    vector = (vector1-vector2)
+    #print(vector1, vector2, vector)
     soma = np.float32(32)
     for x in vector:
         soma += x**2
@@ -37,7 +39,7 @@ def saliency_map(img, Imean):
     img32f = np.float32(img)
     Imean32f = np.float32(Imean)
 
-    Iwhc = [[euclidean_distance(Imean32f-element) for element in row] for row in img32f]
+    Iwhc = [[euclidean_distance(Imean32f,element) for element in row] for row in img32f]
     Iwhc = np.array(Iwhc, dtype=np.uint8)
     return Iwhc
 
@@ -45,7 +47,7 @@ def k_means_gray(img):
     vectorized = img.reshape((-1))
     vectorized = np.float32(vectorized)
 
-    k=5
+    k=6
     attempts = 10
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 0.95)
 
@@ -75,7 +77,7 @@ def write_images(path_folder,name_folder,images):
 
 PATH_IMAGES = 'images/'
 PATH_OUTPUT = 'kmeans_saliency/'
-path = PATH_IMAGES + 'triangulo_ryb.png'
+path = PATH_IMAGES + 'stop.jpg'
 
 name_folder = (path.split('/')[-1]).split('.')[0]
 path_folder = PATH_OUTPUT + name_folder + '/'
@@ -113,7 +115,7 @@ exhibit(1,3,titles,images)
 
 #Imagem gerada usando Kmeans
 segment_saliency = k_means_gray(saliency_img)
-segment_m = segment_mean(segment_saliency)
+segment_m = segment_mean(saliency_img)
 print(segment_m)
 ret, thresh = cv2.threshold(segment_saliency, segment_m, 255, cv2.THRESH_BINARY)
 attention_img_kmeans = cv2.bitwise_and(img,img,mask=thresh)
