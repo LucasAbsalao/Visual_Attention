@@ -20,25 +20,35 @@ def lab_mean(img):
 
 
 def gaussian_smoothing(img, kernel):
-    result = cv2.filter2D(img,-1,kernel)
+    #result = cv2.filter2D(img,-1,kernel)
     result = cv2.GaussianBlur(img,(5,5),0)
     plt.imshow(result)
     plt.show()
     return result
 
 
-def euclidean_distance(vector):
-    soma = np.float32(32)
+def euclidean_distance(vector1, vector2):
+    vector = (vector1-vector2)
+    #print(vector1, vector2, vector)
+    soma = np.float32(0)
     for x in vector:
         soma += x**2
+    #print(math.sqrt(soma))
     return math.sqrt(soma)
+    #return np.linalg.norm(vector)
 
 def saliency_map(img, Imean):
     img32f = np.float32(img)
     Imean32f = np.float32(Imean)
 
-    Iwhc = [[euclidean_distance(Imean32f-element) for element in row] for row in img32f]
-    Iwhc = np.array(Iwhc, dtype=np.uint8)
+    Iwhc = np.zeros((img32f.shape[0],img32f.shape[1]), dtype = np.float32)
+    for i in range(Iwhc.shape[0]):
+        for j in range(Iwhc.shape[1]):
+            Iwhc[i][j] = euclidean_distance(Imean32f,img32f[i][j])
+            print(i,j,Iwhc[i][j])
+    
+    #Iwhc2 = [[euclidean_distance(Imean32f,element) for element in row] for row in img32f]
+    Iwhc = np.array(np.round(Iwhc), dtype=np.uint8)
     return Iwhc
 
 def k_means(img):
@@ -103,9 +113,8 @@ path_folder = PATH_OUTPUT + name_folder + '/'
 
 img = cv2.imread(path)
 
-img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LUV)
 Imean = lab_mean(img_lab)
-
 
 #Figura que representa a média das features do vetor no espaço Lab
 Imean_rgb = cv2.cvtColor(np.array([[Imean]]), cv2.COLOR_LAB2RGB)
@@ -121,6 +130,9 @@ kernel=np.array([1,4,6,4,1])/16
 img_lab_smooth = gaussian_smoothing(img_lab,kernel)
 saliency_img = saliency_map(img_lab_smooth,Imean)
 
+plt.imshow(saliency_img, cmap='gray')
+plt.show()
+print("receba ", Imean, img_lab_smooth[img_lab_smooth.shape[0]-1][img_lab_smooth.shape[1]-4], saliency_img[img_lab_smooth.shape[0]-1][img_lab_smooth.shape[1]-4])
 
 #Imagem gerada utilizando a técnica de OTSU
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -136,7 +148,7 @@ exhibit(1,3,titles,images)
 
 #Imagem gerada usando Kmeans
 segment_hsv = k_means(img_lab)
-segment_rgb = cv2.cvtColor(segment_hsv, cv2.COLOR_LAB2RGB)
+segment_rgb = cv2.cvtColor(segment_hsv, cv2.COLOR_LUV2RGB)
 segments_values = get_unique_values(segment_rgb)
 
 

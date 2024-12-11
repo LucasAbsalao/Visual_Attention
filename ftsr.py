@@ -30,7 +30,7 @@ def gaussian_smoothing(img, kernel):
 def euclidean_distance(vector1,vector2):
     vector = (vector1-vector2)
     #print(vector1, vector2, vector)
-    soma = np.float32(32)
+    soma = np.float32(0)
     for x in vector:
         soma += x**2
     return math.sqrt(soma)
