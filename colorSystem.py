@@ -27,8 +27,7 @@ def f_lab(epsilon, k, t):
 
 def rgb2lab(img):
     img_xyz = rgb2xyz(img)
-    print(img_xyz)
-
+          
     Xn = 95.0489
     Yn = 100
     Zn = 108.884
@@ -46,8 +45,9 @@ def rgb2lab(img):
     return img_Lab#np.uint8(np.round(img_Lab))
 
 
-matrix = np.array([[[1,2,3], [3,2,6], [9,8,4]],
+#Testes
+'''matrix = np.array([[[1,2,3], [3,2,6], [9,8,4]],
                    [[4,5,6], [2,6,4], [4,5,8]],
                    [[3,8,7], [8,4,3], [3,7,9]]])
 
-print(rgb2lab(matrix))
+print(rgb2lab(matrix))'''

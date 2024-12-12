@@ -4,7 +4,7 @@ import math
 from matplotlib import pyplot as plt
 import os
 from show import showAndDestroy, plot_img, exhibit
-
+from colorSystem import rgb2lab
 
 def lab_mean(img):
     L,a,b = cv2.split(img)
@@ -14,7 +14,7 @@ def lab_mean(img):
     amean = np.mean(a)
     bmean = np.mean(b)
 
-    Imean = np.array(np.round([Lmean, amean, bmean]),dtype = np.uint8)
+    Imean = np.array([Lmean, amean, bmean])
     
     return Imean
 
@@ -22,8 +22,6 @@ def lab_mean(img):
 def gaussian_smoothing(img, kernel):
     #result = cv2.filter2D(img,-1,kernel)
     result = cv2.GaussianBlur(img,(5,5),0)
-    plt.imshow(result)
-    plt.show()
     return result
 
 
@@ -45,7 +43,6 @@ def saliency_map(img, Imean):
     for i in range(Iwhc.shape[0]):
         for j in range(Iwhc.shape[1]):
             Iwhc[i][j] = euclidean_distance(Imean32f,img32f[i][j])
-            print(i,j,Iwhc[i][j])
     
     #Iwhc2 = [[euclidean_distance(Imean32f,element) for element in row] for row in img32f]
     Iwhc = np.array(np.round(Iwhc), dtype=np.uint8)
@@ -106,21 +103,23 @@ def write_images(path_folder,name_folder,images):
 
 PATH_IMAGES = 'images/'
 PATH_OUTPUT = 'kmeans_hsv_saliency/'
-path = PATH_IMAGES + 'carro-rua.jpg'
+path = PATH_IMAGES + 'flower.jpeg'
 
 name_folder = (path.split('/')[-1]).split('.')[0]
 path_folder = PATH_OUTPUT + name_folder + '/'
 
 img = cv2.imread(path)
 
-img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LUV)
+#img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LUV)
+img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+img_lab = rgb2lab(img_rgb)
 Imean = lab_mean(img_lab)
 
 #Figura que representa a média das features do vetor no espaço Lab
-Imean_rgb = cv2.cvtColor(np.array([[Imean]]), cv2.COLOR_LAB2RGB)
+'''Imean_rgb = cv2.cvtColor(np.array([[Imean]]), cv2.COLOR_LAB2RGB)
 img_mean = np.full((img_lab.shape), Imean_rgb, dtype = np.uint8)
 plt.imshow(img_mean)
-plt.show()
+plt.show()'''
 
 print(img.shape)
 
