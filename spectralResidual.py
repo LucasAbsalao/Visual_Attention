@@ -6,6 +6,10 @@ import os
 from show import showAndDestroy, plot_img
 
 
+def real_part(img):
+    fft = np.fft.fft(img)
+
+    
 
 PATH_IMAGENS = 'images/'
 
