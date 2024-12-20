@@ -101,9 +101,10 @@ def write_images(path_folder,name_folder,images):
     cv2.imwrite(path_folder+name_folder+'_kmeansHSV_saliency_map.png', write_img[3])
     cv2.imwrite(path_folder+name_folder+'_kmeans_image.png', write_img[4])
 
+    
 PATH_IMAGES = 'images/'
 PATH_OUTPUT = 'kmeans_hsv_saliency/'
-path = PATH_IMAGES + 'flower.jpeg'
+path = PATH_IMAGES + 'Tool_10.png'
 
 name_folder = (path.split('/')[-1]).split('.')[0]
 path_folder = PATH_OUTPUT + name_folder + '/'
@@ -115,7 +116,7 @@ img_rgb = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 img_lab = rgb2lab(img_rgb)
 Imean = lab_mean(img_lab)
 
-#Figura que representa a média das features do vetor no espaço Lab
+#Figura que representa a média das features do vetor no espaço Lab TODO: Conversão de Lab para rgb
 '''Imean_rgb = cv2.cvtColor(np.array([[Imean]]), cv2.COLOR_LAB2RGB)
 img_mean = np.full((img_lab.shape), Imean_rgb, dtype = np.uint8)
 plt.imshow(img_mean)
